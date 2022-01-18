@@ -107,7 +107,7 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-project(cmaketest LANGUAGES C CXX)
+project(cmake_template_win64 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -134,10 +134,18 @@ add_library(applib
     ${MY_PROJ_ROOT}/src/testclass.cpp
     ${MY_PROJ_ROOT}/include/testclass.h)
 
+target_include_directories(applib PRIVATE
+    ${MY_PROJ_ROOT}/include
+    )
+
 #build a shared library (.so / DLL)
 add_library(applib2 SHARED
     ${MY_PROJ_ROOT}/src/testclass.cpp
     ${MY_PROJ_ROOT}/include/testclass.h)
+
+target_include_directories(applib2 PRIVATE
+    ${MY_PROJ_ROOT}/include
+    )
 
 add_executable(cmaketest
     ${MY_PROJ_ROOT}/src/main.cpp

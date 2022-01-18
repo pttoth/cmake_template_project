@@ -1,9 +1,10 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
-bin/*
 *.user
 CMakeLists.txt.user.*
+bin/*
+projects/build-*
 
 #-------------------------
 *~
