@@ -1,5 +1,3 @@
-# cmaketest
+# cmake template project
 
-A few notes I've made for myself to ease creation of new cmake projects
-
-see CMakeLists.txt
+A versatile CMake template project to easily set up the structure of a new project.

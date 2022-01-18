@@ -109,11 +109,11 @@ cmake_minimum_required(VERSION 3.5)
 
 project(cmaketest LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-set(MY_PROJ_ROOT ${PROJECT_SOURCE_DIR})
+set(MY_PROJ_ROOT ${PROJECT_SOURCE_DIR}/../..)
 
 #set(MY_BUILD_DIR ${MY_PROJ_ROOT}/build)
 
@@ -122,7 +122,7 @@ set(MY_OUTPUT_DIR_WIN64 ${MY_PROJ_ROOT}/bin/win64)
 set(MY_OUTPUT_DIR_DEBIAN ${MY_PROJ_ROOT}/bin/debian)
 
 #set up actual output directory
-set(MY_OUTPUT_DIR ${MY_OUTPUT_DIR_DEBIAN})
+set(MY_OUTPUT_DIR ${MY_OUTPUT_DIR_WIN32})
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
@@ -131,36 +131,29 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
 
 #build an archive (.a), for static linking
 add_library(applib
-    src/testclass.cpp
-    include/testclass.h)
+    ${MY_PROJ_ROOT}/src/testclass.cpp
+    ${MY_PROJ_ROOT}/include/testclass.h)
 
 #build a shared library (.so / DLL)
 add_library(applib2 SHARED
-    src/testclass.cpp
-    include/testclass.h)
+    ${MY_PROJ_ROOT}/src/testclass.cpp
+    ${MY_PROJ_ROOT}/include/testclass.h)
 
-#build an executable
 add_executable(cmaketest
-    src/main.cpp
-    src/testclass.cpp
-    include/testclass.h
+    ${MY_PROJ_ROOT}/src/main.cpp
+    ${MY_PROJ_ROOT}/src/testclass.cpp
+    ${MY_PROJ_ROOT}/include/testclass.h
     )
 
-#set up include directories
 target_include_directories(cmaketest PRIVATE
     ${MY_PROJ_ROOT}/include
     )
 
-#set up library linking directories
-#  target_link_libraries(cmaketest applib)
 
 
-#--------------------------------------------------
-
-#cmake_minimum_required(VERSION 2.4)
-#project(hello_world)
-#include_directories(${PROJECT_SOURCE_DIR})
-#add_library(applib foo.cpp)
-#add_executable(app main.cpp)
-#target_link_libraries(app applib)
+#set up library linking paths
+#  directories and library names both come here
+#target_link_libraries(cmaketest
+#   applib
+#   )
 
