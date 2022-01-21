@@ -132,36 +132,39 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
 #build an archive (.a), for static linking
 add_library(applib
     ${MY_PROJ_ROOT}/src/testclass.cpp
-    ${MY_PROJ_ROOT}/include/testclass.h)
+    ${MY_PROJ_ROOT}/include/testclass.h
+)
 
 target_include_directories(applib PRIVATE
     ${MY_PROJ_ROOT}/include
-    )
+)
 
 #build a shared library (.so / DLL)
 add_library(applib2 SHARED
     ${MY_PROJ_ROOT}/src/testclass.cpp
-    ${MY_PROJ_ROOT}/include/testclass.h)
+    ${MY_PROJ_ROOT}/include/testclass.h
+)
 
 target_include_directories(applib2 PRIVATE
     ${MY_PROJ_ROOT}/include
-    )
+)
 
 add_executable(cmaketest
     ${MY_PROJ_ROOT}/src/main.cpp
     ${MY_PROJ_ROOT}/src/testclass.cpp
     ${MY_PROJ_ROOT}/include/testclass.h
-    )
+)
 
 target_include_directories(cmaketest PRIVATE
     ${MY_PROJ_ROOT}/include
-    )
+)
 
 
 
 #set up library linking paths
 #  directories and library names both come here
 #target_link_libraries(cmaketest
-#   applib
-#   )
+#   -L<directory>
+#   -l<applib>
+#)
 
