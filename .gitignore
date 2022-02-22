@@ -4,6 +4,7 @@
 *.user
 CMakeLists.txt.user.*
 bin/*
+build/*
 lib/*
 projects/build-*
 
