@@ -114,7 +114,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 set(MY_PROJ_ROOT ${PROJECT_SOURCE_DIR}/../..)
-
+set(MY_BUILD_DIR ${MY_PROJ_ROOT}/build)
 set(MY_OUTPUT_DIR_WIN32 ${MY_PROJ_ROOT}/bin/win32)
 set(MY_OUTPUT_DIR_WIN64 ${MY_PROJ_ROOT}/bin/win64)
 set(MY_OUTPUT_DIR_DEBIAN ${MY_PROJ_ROOT}/bin/debian)
@@ -123,10 +123,10 @@ set(MY_OUTPUT_DIR_DEBIAN ${MY_PROJ_ROOT}/bin/debian)
 set(MY_OUTPUT_DIR ${MY_OUTPUT_DIR_DEBIAN})
 set(MY_OUTPUT_DIR_DEBUG ${MY_OUTPUT_DIR}_debug)
 
-#default output directory (when cuilding from cmd with everything default)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${MY_OUTPUT_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${MY_OUTPUT_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${MY_OUTPUT_DIR})
+#default output directory (when building from cmd with everything default)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${MY_OUTPUT_DIR})
 
 #release build directory settings
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${MY_OUTPUT_DIR})
@@ -137,6 +137,17 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${MY_OUTPUT_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${MY_OUTPUT_DIR_DEBUG})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${MY_OUTPUT_DIR_DEBUG})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${MY_OUTPUT_DIR_DEBUG})
+
+set(CMAKE_CACHEFILE_DIR ${MY_BUILD_DIR})
+
+set(MY_COMPILE_FLAGS "-Wall -Wextra") # '-fPIC' for libraries
+set(CMAKE_C_FLAGS ${MY_COMPILE_FLAGS})
+set(CMAKE_CXX_FLAGS ${MY_COMPILE_FLAGS})
+
+#(linux) sets up the executable to look for libs in the same directory during runtime
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+SET(CMAKE_INSTALL_RPATH "$\{ORIGIN\}")
 
 
 #build an archive (.a), for static linking
@@ -171,6 +182,12 @@ target_include_directories(cmaketest PRIVATE
     /usr/include
     ${MY_PROJ_ROOT}/include
 )
+
+#for libraries
+#to generate position-independent code (to be correctly addressed by outside code)
+# set_target_properties(applib PROPERTIES COMPILE_FLAGS
+#     "${MY_COMPILE_FLAGS} -fPIC"
+# )
 
 
 
