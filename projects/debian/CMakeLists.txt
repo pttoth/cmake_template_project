@@ -183,6 +183,11 @@ target_include_directories(cmaketest PRIVATE
     ${MY_PROJ_ROOT}/include
 )
 
+#enforce build order
+add_dependencies(cmaketest applib applib2)
+
+
+
 #for libraries
 #to generate position-independent code (to be correctly addressed by outside code)
 # set_target_properties(applib PROPERTIES COMPILE_FLAGS
