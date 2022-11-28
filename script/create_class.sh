@@ -19,8 +19,8 @@ sParentClassname="n/a"
 sNamespace="n/a"
 
 #TODO: read
-sFilePathH="n/a"
-sFilePathS="n/a"
+sFilePathH=""
+sFilePathS=""
 
 
 #--------------------------------------------------
@@ -31,13 +31,13 @@ sFilePathS="n/a"
 fnReadClassName()#CFG_START
 {
 	local sInBuffer=""
-	
+
 	while [ -z $sInBuffer ];
 	do
 		echo "class name:"
 		read sInBuffer
 	done
-	
+
 	sClassname=${sInBuffer}
 	sFileNameH=${sInBuffer}
 	sFileNameS=${sInBuffer}.cpp
@@ -50,12 +50,12 @@ fnReadHeaderExtension()
 {
 	local sInBuffer=""
 	local bValid=""
-	
+
 	while [ -z $bValid ];
 	do
 		echo "Header is .h and NOT .hpp? (Y/n) ('n', if .hpp)"
 		read sInBuffer
-		
+
 		if [ -z $sInBuffer ];
 		then
 			bValid=1
@@ -75,19 +75,63 @@ fnReadHeaderExtension()
 		fi
 	done
 	sFileNameH=${sFileNameH}${sHeaderExt}
+	sFilePathH="include/"${sFileNameH}
+	sFilePathS="src/"${sFileNameS}
 }
+
+
+fnReadFilePath()
+{
+	local sInBuffer=""
+	local bValid=""
+
+	while [ -z $bValid ];
+	do
+		sInBuffer=""
+		echo "Path inside 'include/' and 'src/' :"
+		read sInBuffer
+
+		if [[ -n $sInBuffer ]];
+		then
+			echo ${#sInBuffer}
+			sInBuffer=$sInBuffer"/"
+		fi
+
+		sFilePathH="include/"${sInBuffer}${sFileNameH}
+		sFilePathS="src/"${sInBuffer}${sFileNameS}
+
+		echo Header path: $sFilePathH
+		echo Source path: $sFilePathS
+		echo "OK? (Y/n)"
+
+		sInBuffer=""
+		read sInBuffer
+
+		if [ -z $sInBuffer ] || [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
+		then
+			bValid=1
+		else
+			if [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ] ;
+			then
+				bValid=""
+			fi
+			echo "invalid parameter!"
+		fi
+	done
+}
+
 
 
 fnReadParentClass()
 {
 	local sInBuffer=""
 	local bValid=""
-	
+
 	while [ -z $bValid ];
 	do
 		echo "Inherits from a class (y/N)?"
 		read sInBuffer
-		
+
 		if [ -z $sInBuffer ];
 		then
 			bValid=1
@@ -105,7 +149,7 @@ fnReadParentClass()
 			echo "invalid parameter!"
 		fi
 	done
-	
+
 	sInBuffer=""
 	if [ $bHasParent == "true" ]
 	then
@@ -114,7 +158,7 @@ fnReadParentClass()
 			echo "Parent class name:"
 			read sInBuffer
 		done
-		
+
 		sParentClassname=$sInBuffer
 	fi
 }
@@ -124,12 +168,12 @@ fnReadNamespace()
 {
 	local sInBuffer=""
 	local bValid=""
-	
+
 	while [[ -z $bValid ]]
 	do
 		echo "Add under a namespace? (y/N)"
 		read sInBuffer
-		
+
 		if [ -z $sInBuffer ];
 		then
 			bValid=1
@@ -147,7 +191,7 @@ fnReadNamespace()
 			echo "invalid parameter!"
 		fi
 	done
-	
+
 	sInBuffer=""
 	if [ $bHasNamespace == "true" ]
 	then
@@ -156,7 +200,7 @@ fnReadNamespace()
 			echo "Namespace name:"
 			read sInBuffer
 		done
-		
+
 		sNamespace=$sInBuffer
 	fi	
 }
@@ -166,7 +210,7 @@ fnReadExplicitFunctions()
 {
 	local sInBuffer=""
 	local bValid=""
-	
+
 	while [[ -z $bValid ]]
 	do
 		echo "Make functions explicit default? (y/N)"
@@ -187,7 +231,7 @@ fnReadExplicitFunctions()
 			echo "invalid parameter!"
 		fi
 	done
-	
+
 }
 
 
@@ -208,6 +252,7 @@ popd > /dev/null
 
 fnReadClassName
 fnReadHeaderExtension
+fnReadFilePath
 fnReadParentClass
 fnReadNamespace
 fnReadExplicitFunctions
@@ -220,8 +265,8 @@ then
 fi
 
 echo "Class name:                 " $sClassname
-echo "Header file path:           " $sFileNameH
-echo "Source file path:           " $sFileNameS
+echo "Header file path:           " $sFilePathH
+echo "Source file path:           " $sFilePathS
 
 if [ $bHasParent == "true" ];
 then
