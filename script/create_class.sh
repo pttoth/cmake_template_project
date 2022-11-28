@@ -1,7 +1,8 @@
 #!/bin/bash
 
+
 #--------------------------------------------------
-#  read data
+#  global vars
 #--------------------------------------------------
 
 bIsHpp=f
@@ -13,38 +14,47 @@ sClassname=""
 sParentClassname=""
 sNamespace=""
 
-sInBuffer=""
-bValid=""
+
+#--------------------------------------------------
+#  function definitions
+#--------------------------------------------------
 
 
-fnReadClassName(){
+fnReadClassName()
+{
 	local sInBuffer=""
+	
 	while [ -z $sInBuffer ];
 	do
-		echo "len:" ${#sInBuffer}
-		echo sInBuffer: $sInBuffer
 		echo "class name:"
 		read sInBuffer
 	done
 	
 	sClassname=$sInBuffer
-	sInBuffer=""
 }
 
 
-fnReadHeaderExtension(){
-	while [[ -n bValid ]]
+fnReadHeaderExtension()
+{
+	local sInBuffer=""
+	local bValid=""
+	
+	while [ -z $bValid ];
 	do
 		echo "Header is .h and NOT .hpp? (Y/n) ('n', if .hpp)"
 		read sInBuffer
-		if [ [ sInBuffer == "y" ] || [ sInBuffer == "Y" ] ]
+		
+		if [ -z $sInBuffer ];
 		then
 			bValid=1
-			bIsHpp=t
-		elif [ [ sInBuffer == "n" ] || [ sInBuffer == "N" ] ]
+		elif [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
 		then
 			bValid=1
-			bIsHpp=f
+			bIsHpp="t"
+		elif [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ] ;
+		then
+			bValid=1
+			bIsHpp="f"
 		else
 			bValid=""
 		fi
@@ -52,8 +62,12 @@ fnReadHeaderExtension(){
 }
 
 
-fnReadParentClass(){
-	while [[ -n bValid ]]
+fnReadParentClass()
+{
+	local sInBuffer="n"
+	local bValid=""
+	
+	while [ -z $bValid ];
 	do
 		echo "Inherits from a class (y/N)?"
 		read sInBuffer
@@ -85,7 +99,11 @@ fnReadParentClass(){
 }
 
 
-fnReadNamespace(){
+fnReadNamespace()
+{
+	local sInBuffer=""
+	local bValid=""
+	
 	while [[ -n bValid ]]
 	do
 		echo "Add under a namespace? (y/N)"
@@ -152,10 +170,10 @@ popd > /dev/null
 
 
 fnReadClassName
-#fnReadHeaderExtension
-#fnReadParentClass
-#fnReadNamespace
-#fnReadExplicitFunctions
+fnReadHeaderExtension
+fnReadParentClass
+fnReadNamespace
+fnReadExplicitFunctions
 
 
 echo Class name:                    $sClassname
