@@ -93,7 +93,6 @@ fnReadFilePath()
 
 		if [[ -n $sInBuffer ]];
 		then
-			echo ${#sInBuffer}
 			sInBuffer=$sInBuffer"/"
 		fi
 
@@ -279,7 +278,7 @@ then
 fi
 echo "--------------------------------------------------"
 
-
+#
 #TODO:
 #	check existing files!
 
