@@ -5,14 +5,22 @@
 #  global vars
 #--------------------------------------------------
 
-bIsHpp=f
-bHasParent=f
-bHasNamespace=f
-bExplicitDefault=f
+bIsHpp="false"
+bHasParent="false"
+bHasNamespace="false"
+bExplicitDefault="false"
 
-sClassname=""
-sParentClassname=""
-sNamespace=""
+sHeaderExt=".h"
+sClassname="n/a"
+sFileNameH="n/a"
+sFileNameS="n/a"
+
+sParentClassname="n/a"
+sNamespace="n/a"
+
+#TODO: read
+sFilePathH="n/a"
+sFilePathS="n/a"
 
 
 #--------------------------------------------------
@@ -20,7 +28,7 @@ sNamespace=""
 #--------------------------------------------------
 
 
-fnReadClassName()
+fnReadClassName()#CFG_START
 {
 	local sInBuffer=""
 	
@@ -30,7 +38,11 @@ fnReadClassName()
 		read sInBuffer
 	done
 	
-	sClassname=$sInBuffer
+	sClassname=${sInBuffer}
+	sFileNameH=${sInBuffer}
+	sFileNameS=${sInBuffer}.cpp
+	#sFileNameH=$(echo $ClassName | tr [:upper:] [:lower:])
+	#sFileNameS=$(echo $ClassName | tr [:upper:] [:lower:])
 }
 
 
@@ -50,51 +62,60 @@ fnReadHeaderExtension()
 		elif [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
 		then
 			bValid=1
-			bIsHpp="t"
+			bIsHpp="true"
+			sHeaderExt=".h"
 		elif [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ] ;
 		then
 			bValid=1
-			bIsHpp="f"
+			bIsHpp="false"
+			sHeaderExt=".hpp"
 		else
 			bValid=""
+			echo "invalid parameter!"
 		fi
 	done
+	sFileNameH=${sFileNameH}${sHeaderExt}
 }
 
 
 fnReadParentClass()
 {
-	local sInBuffer="n"
+	local sInBuffer=""
 	local bValid=""
 	
 	while [ -z $bValid ];
 	do
 		echo "Inherits from a class (y/N)?"
 		read sInBuffer
-		if [ [ sInBuffer == "y" ] || [ sInBuffer == "Y" ] ]
+		
+		if [ -z $sInBuffer ];
 		then
 			bValid=1
-			bHasParent=t
-		elif [ [ sInBuffer == "n" ] || [ sInBuffer == "N" ] ]
+		elif [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
 		then
 			bValid=1
-			bHasParent=f
+			bHasParent="true"
+		elif [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ];
+		then
+			bValid=1
+			bHasParent="false"
 			sParentClassname="n/a"
 		else
 			bValid=""
+			echo "invalid parameter!"
 		fi
 	done
 	
-	inBuffer=""
-	if [ bHasParent == t ]
+	sInBuffer=""
+	if [ $bHasParent == "true" ]
 	then
-		while [[ -n inBuffer ]]
+		while [ -z $sInBuffer ]
 		do
 			echo "Parent class name:"
-			read inBuffer
+			read sInBuffer
 		done
 		
-		sParentClassname=$inBuffer
+		sParentClassname=$sInBuffer
 	fi
 }
 
@@ -104,52 +125,66 @@ fnReadNamespace()
 	local sInBuffer=""
 	local bValid=""
 	
-	while [[ -n bValid ]]
+	while [[ -z $bValid ]]
 	do
 		echo "Add under a namespace? (y/N)"
 		read sInBuffer
-		if [ [ sInBuffer == "y" ] || [ sInBuffer == "Y" ] ]
+		
+		if [ -z $sInBuffer ];
 		then
 			bValid=1
-			bHasNamespace=t
-		elif [ [ sInBuffer == "n" ] || [ sInBuffer == "N" ] ]
+		elif [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
 		then
 			bValid=1
-			bHasNamespace=f
+			bHasNamespace="true"
+		elif [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ];
+		then
+			bValid=1
+			bHasNamespace="false"
 			sNamespace="n/a"
 		else
 			bValid=""
+			echo "invalid parameter!"
 		fi
 	done
 	
-	if [ bHasNamespace == t ]
+	sInBuffer=""
+	if [ $bHasNamespace == "true" ]
 	then
-		while [[ -n inBuffer ]]
+		while [[ -z $sInBuffer ]]
 		do
 			echo "Namespace name:"
-			read inBuffer
+			read sInBuffer
 		done
 		
-		sNamespace=$inBuffer
+		sNamespace=$sInBuffer
 	fi	
 }
 
 
-fnReadExplicitFunctions(){
-	while [[ -n bValid ]]
+fnReadExplicitFunctions()
+{
+	local sInBuffer=""
+	local bValid=""
+	
+	while [[ -z $bValid ]]
 	do
 		echo "Make functions explicit default? (y/N)"
 		read sInBuffer
-		if [ [ sInBuffer == "y" ] || [ sInBuffer == "Y" ] ]
+		if [ -z $sInBuffer ];
 		then
 			bValid=1
-			inExplicitDef=t
-		elif [ [ sInBuffer == "n" ] || [ sInBuffer == "N" ] ]
+		elif [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
 		then
 			bValid=1
-			inExplicitDef=f
+			bExplicitDefault="true"
+		elif [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ];
+		then
+			bValid=1
+			bExplicitDefault="false"
 		else
 			bValid=""
+			echo "invalid parameter!"
 		fi
 	done
 	
@@ -167,6 +202,8 @@ popd > /dev/null
 
 #move to project root directory
 #pushd $scriptdir
+#popd #from $scriptdir
+
 
 
 fnReadClassName
@@ -176,11 +213,30 @@ fnReadNamespace
 fnReadExplicitFunctions
 
 
-echo Class name:                    $sClassname
-echo Parent class name:             $sParentClassname
-echo Namespace name:                $sNamespace
-echo Header extension:              $bIsHpp
-echo Explicit default functions:    $bExplicitDefault
+echo "--------------------------------------------------"
+if [ $bHasNamespace == "true" ];
+then
+	echo "Namespace name:             " $sNamespace
+fi
+
+echo "Class name:                 " $sClassname
+echo "Header file path:           " $sFileNameH
+echo "Source file path:           " $sFileNameS
+
+if [ $bHasParent == "true" ];
+then
+	echo "Parent class name:          " $sParentClassname
+fi
+
+if [ $bExplicitDefault == "true" ];
+then
+	echo "Explicit default functions: " $bExplicitDefault
+fi
+echo "--------------------------------------------------"
+
+
+#TODO:
+#	check existing files!
 
 
 #TODO: check input
@@ -190,11 +246,9 @@ echo Explicit default functions:    $bExplicitDefault
 #  create file
 #--------------------------------------------------
 
-sFileExtension=""
-
 #if[[ -n -z VarName ]] 
 #fi
-if [ bIsHpp==true ] ;
+if [ bIsHpp=="true" ] ;
 then
 	sFileExtension=".h"
 else
@@ -205,4 +259,4 @@ fi
 
 
 
-popd #from $scriptdir
+

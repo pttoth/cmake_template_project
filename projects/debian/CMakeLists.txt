@@ -100,7 +100,16 @@
 #   install(TARGETS <target>)
 
 
+#--------------------------------------------------
+#   Script helper config
+#--------------------------------------------------
+#the helper scripts configure themselves here before writing the project file
+#  it only parses contents between #CFG_START and #CFG_END
+#-----
+#CFG_START
+#ScriptProjectRoot=${MY_PROJ_ROOT}
 
+#CFG_END
 #--------------------------------------------------
 #   Project
 #--------------------------------------------------
