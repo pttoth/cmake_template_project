@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #--------------------------------------------------
 #  global vars
 #--------------------------------------------------
@@ -75,8 +74,8 @@ fnReadHeaderExtension()
 		fi
 	done
 	sFileNameH=${sFileNameH}${sHeaderExt}
-	sFilePathH="include/"${sFileNameH}
-	sFilePathS="src/"${sFileNameS}
+	sFilePathH=${sFileNameH}
+	sFilePathS=${sFileNameS}
 }
 
 
@@ -96,12 +95,16 @@ fnReadFilePath()
 			sInBuffer=$sInBuffer"/"
 		fi
 
-		sFilePathH="include/"${sInBuffer}${sFileNameH}
-		sFilePathS="src/"${sInBuffer}${sFileNameS}
+		sFilePathH=${sInBuffer}${sFileNameH}
+		sFilePathS=${sInBuffer}${sFileNameS}
 
-		echo Header path: $sFilePathH
-		echo Source path: $sFilePathS
+		echo Header path: "include/"$sFilePathH
+		echo Source path: "src/"$sFilePathS
 		echo "OK? (Y/n)"
+
+		sFilePathH="$ProjectDir/include/"${sInBuffer}${sFileNameH}
+		sFilePathS="$ProjectDir/src/"${sInBuffer}${sFileNameS}
+
 
 		sInBuffer=""
 		read sInBuffer
@@ -243,6 +246,11 @@ pushd $(dirname "${BASH_SOURCE[0]}") > /dev/null
 scriptdir=$(pwd)
 popd > /dev/null
 
+#here, the path is <projectpath>/script/..
+#fix it to <projectpath>
+ProjectDir=$(dirname -- $scriptdir)
+
+
 #move to project root directory
 #pushd $scriptdir
 #popd #from $scriptdir
@@ -252,8 +260,8 @@ popd > /dev/null
 fnReadClassName
 fnReadHeaderExtension
 fnReadFilePath
-fnReadParentClass
-fnReadNamespace
+#fnReadParentClass
+#fnReadNamespace
 fnReadExplicitFunctions
 
 
@@ -281,7 +289,35 @@ echo "--------------------------------------------------"
 #
 #TODO:
 #	check existing files!
+sProjectRoot=""
+sFPathH=${sProjectRoot}"/"${sFilePathH}
+sFPathS=${sProjectRoot}"/"${sFilePathS}
+bAbortCopy="false"
 
+if [[ -e $sFPathH ]];
+then
+	echo "ERROR: file '$sFPathH' already exists!"
+	bAbortCopy="true"
+fi
+
+if [[ -e $sFPathS ]];
+then
+	echo "ERROR: file '$sFPathS' already exists!"
+	bAbortCopy="true"
+fi
+
+if [ $bAbortCopy=="false" ];
+then
+	FData=$(cat ./data/newclass.h)
+
+	#replace class name
+
+	#remove/rename namespace ?
+
+
+
+
+fi
 
 #TODO: check input
 #read
@@ -290,17 +326,38 @@ echo "--------------------------------------------------"
 #  create file
 #--------------------------------------------------
 
-#if[[ -n -z VarName ]] 
-#fi
-if [ bIsHpp=="true" ] ;
+#TODO: get scriptfolder
+soParentInclude='#include "'$sParentClassname'.h"'
+soNamespaceOpen="namespace "$sNamespace"{"
+soNamespaceClose="} // end of namespace '"$sNamespace"'"
+soClassName=$sClassname
+soParentClassInherit=": public "$sParentClassname
+soDefDefault=" = default"
+
+
+if [[ bHasParent=="false" ]];
 then
-	sFileExtension=".h"
-else
-	sFileExtension=".hpp"
+	soParentInclude=""
+	soParentClassInherit=""
 fi
 
 
+if [[ bHasNamespace=="false" ]];
+then
+	soNamespace=""
+	soNamespaceOpen=""
+	soNamespaceClose=""
+else
+	#TODO: set up 'mkdir' for namespace paths
+	echo
+fi
 
 
+if [[ bExplicitDefault=="false" ]];
+then
+	soDefDefault=""
+fi
 
+
+cat $scriptdir/data/newclass.h | sed 's/__parentInclude__/$soParentInclude/g' | sed 's/__namespaceOpen__/$soNamespaceOpen/g' | sed 's/__namespaceClose__/$soNamespaceClose/g' | sed 's/__className__/$soClassName/g' | sed 's/__parentClassInherit__/$soParentClassInherit/g' | sed 's/__defDefault__/$soDefDefault/g' > $sFilePathH
 
