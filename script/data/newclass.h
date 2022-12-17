@@ -1,19 +1,10 @@
-//.h or .hpp
-
-//has namespace?
-
-//inherits something?
-
-//default functions?
-
 #pragma once
 
-#include <parentclass.h>
+#include "parentclass.h"
 
-namespace ClassNameSpace: public ParentClass
-{
+namespace ClassNameSpace{
 
-class NewClass
+class NewClass: public ParentClass
 {
 public:
     NewClass() = default;
