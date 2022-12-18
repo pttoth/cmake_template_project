@@ -163,69 +163,69 @@ fnReadFilePath()
 	fi
 	
 	#local vars
-	local sProjectPath=$1
-	local sInBuffer=""
-	local bValid="" # "" or 1
-	local bFilesExist=0
-	local sFilePathH=""
-	local sFilePathS=""
+	local lsProjectPath=$1
+	local lsInBuffer=""
+	local lbValid="" # "" or 1
+	local lbFilesExist=0
+	local lsFilePathH=""
+	local lsFilePathS=""
 
-	while [ -z $bValid ];
+	while [ -z $lbValid ];
 	do
-		bValid=""
-		bFilesExist=0
-		sInBuffer=""
+		lbValid=""
+		lbFilesExist=0
+		lsInBuffer=""
 		echo -n "Path inside 'include/' and 'src/': "
-		read sInBuffer
+		read lsInBuffer
 
 		#TODO: check this, whether it defaults to root, etc.
 		#		it shouldn't do root, and give error instead
-		if [[ -n $sInBuffer ]];
+		if [[ -n $lsInBuffer ]];
 		then
-			sInBuffer=$sInBuffer"/"
+			lsInBuffer=$lsInBuffer"/"
 		fi
 
-		sFilePathH=${sInBuffer}${sFileNameH}
-		sFilePathS=${sInBuffer}${sFileNameS}
-		sAbsPathH=${sProjectPath}'/include/'${sFilePathH}
-		sAbsPathS=${sProjectPath}'/src/'${sFilePathS}
+		lsFilePathH=${lsInBuffer}${sFileNameH}
+		lsFilePathS=${lsInBuffer}${sFileNameS}
+		sAbsPathH=${lsProjectPath}'/include/'${lsFilePathH}
+		sAbsPathS=${lsProjectPath}'/src/'${lsFilePathS}
 		
 		#check whether files exist
 		if [ -a $sAbsPathH ];
 		then
 			echo "ERROR: " $sAbsPathH " already exists!"
-			bFilesExist=1
-			bValid=""
+			lbFilesExist=1
+			lbValid=""
 		fi
 
 		if [ -a $sAbsPathS ];
 		then
 			echo "ERROR: " $sAbsPathS " already exists!"
-			bFilesExist=1
-			bValid=""
+			lbFilesExist=1
+			lbValid=""
 		fi
 
 
-		if [[ 0 == $bFilesExist ]];
+		if [[ 0 == $lbFilesExist ]];
 		then
-			echo Header path: "include/"${sFilePathH}
-			echo Source path: "src/"${sFilePathS}
+			echo Header path: "include/"${lsFilePathH}
+			echo Source path: "src/"${lsFilePathS}
 			echo -n "OK? (Y/n) "
 
-			sFilePathH="${ProjectDir}/include/"${sInBuffer}${sFileNameH}
-			sFilePathS="${ProjectDir}/src/"${sInBuffer}${sFileNameS}
+			lsFilePathH="${ProjectDir}/include/"${lsInBuffer}${sFileNameH}
+			lsFilePathS="${ProjectDir}/src/"${lsInBuffer}${sFileNameS}
 
 
-			sInBuffer=""
-			read sInBuffer
+			lsInBuffer=""
+			read lsInBuffer
 
-			if [ -z $sInBuffer ] || [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
+			if [ -z $lsInBuffer ] || [ $lsInBuffer == "y" ] || [ $lsInBuffer == "Y" ];
 			then
-				bValid=1
+				lbValid=1
 			else
-				if [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ] ;
+				if [ $lsInBuffer == "n" ] || [ $lsInBuffer == "N" ] ;
 				then
-					bValid=""
+					lbValid=""
 				fi
 				echo "invalid parameter!"
 			fi
