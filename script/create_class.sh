@@ -187,8 +187,11 @@ fnReadFilePath()
 
 		lsFilePathH=${lsInBuffer}${sFileNameH}
 		lsFilePathS=${lsInBuffer}${sFileNameS}
+		sFilePathH='include/'${lsFilePathH}
+		sFilePathS='src/'${lsFilePathS}
 		sAbsPathH=${lsProjectPath}'/include/'${lsFilePathH}
 		sAbsPathS=${lsProjectPath}'/src/'${lsFilePathS}
+		
 		
 		#check whether files exist
 		if [ -a $sAbsPathH ];
@@ -219,15 +222,16 @@ fnReadFilePath()
 			lsInBuffer=""
 			read lsInBuffer
 
-			if [ -z $lsInBuffer ] || [ $lsInBuffer == "y" ] || [ $lsInBuffer == "Y" ];
+			if [ -z $lsInBuffer ] || [[ $lsInBuffer == "y" ]] || [[ $lsInBuffer == "Y" ]];
 			then
 				lbValid=1
 			else
-				if [ $lsInBuffer == "n" ] || [ $lsInBuffer == "N" ] ;
+				if [[ $lsInBuffer == "n" ]] || [[ $lsInBuffer == "N" ]] ;
 				then
 					lbValid=""
+				else
+					echo "invalid parameter!"
 				fi
-				echo "invalid parameter!"
 			fi
 		fi
 	done
@@ -380,8 +384,8 @@ fi
 
 echo "Class name:                 " $sClassname
 echo "Header file name:           " $sFileNameH
-echo "Source file name:           " $sFileNameS
 echo "Header file relative path:  " $sFilePathH
+echo "Source file name:           " $sFileNameS
 echo "Source file relative path:  " $sFilePathS
 
 if [ $bHasParent == "true" ];
@@ -395,49 +399,20 @@ then
 fi
 echo "--------------------------------------------------"
 
-#
-#TODO:
-#	check existing files!
-sProjectRoot=""
-sFPathH=${sProjectRoot}"/"${sFilePathH}
-sFPathS=${sProjectRoot}"/"${sFilePathS}
 
-#check for conflicts with existing files
-bAbortCopy="false"
-
-if [[ -e $sFPathH ]];
-then
-	echo "ERROR: file '$sFPathH' already exists!"
-	bAbortCopy="true"
-fi
-
-if [[ -e $sFPathS ]];
-then
-	echo "ERROR: file '$sFPathS' already exists!"
-	bAbortCopy="true"
-fi
-
-if [ $bAbortCopy=="false" ];
-then
-	FData=$(cat ./data/newclass.h)
-
-	#replace class name
-
-	#remove/rename namespace ?
-
-
-
-
-fi
-
-#TODO: check input
-#read
 
 #--------------------------------------------------
 #  create file
 #--------------------------------------------------
 
 #TODO: get scriptfolder
+
+#TODO: create folder structures in 'include/' and 'src/'
+
+#TODO: check again for existing files and silently rename them to <name>.bak, just in case someone created them since checking
+
+
+#set up substitutions for string patterns
 soParentInclude='#include "'$sParentClassname'.h"'
 soNamespaceOpen="namespace "$sNamespace"{"
 soNamespaceClose="} // end of namespace '"$sNamespace"'"
