@@ -189,28 +189,27 @@ fnReadFilePath()
 		if [[ 0==$bFilesExist ]];
 		then
 
-		#temporarily skipped indentation for commit's diff-clarity
-		echo Header path: "include/"$sFilePathH
-		echo Source path: "src/"$sFilePathS
-		echo "OK? (Y/n)"
+			echo Header path: "include/"$sFilePathH
+			echo Source path: "src/"$sFilePathS
+			echo "OK? (Y/n)"
 
-		sFilePathH="$ProjectDir/include/"${sInBuffer}${sFileNameH}
-		sFilePathS="$ProjectDir/src/"${sInBuffer}${sFileNameS}
+			sFilePathH="$ProjectDir/include/"${sInBuffer}${sFileNameH}
+			sFilePathS="$ProjectDir/src/"${sInBuffer}${sFileNameS}
 
 
-		sInBuffer=""
-		read sInBuffer
+			sInBuffer=""
+			read sInBuffer
 
-		if [ -z $sInBuffer ] || [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
-		then
-			bValid=1
-		else
-			if [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ] ;
+			if [ -z $sInBuffer ] || [ $sInBuffer == "y" ] || [ $sInBuffer == "Y" ];
 			then
-				bValid=""
+				bValid=1
+			else
+				if [ $sInBuffer == "n" ] || [ $sInBuffer == "N" ] ;
+				then
+					bValid=""
+				fi
+				echo "invalid parameter!"
 			fi
-			echo "invalid parameter!"
-		fi
 
 		fi
 	done
