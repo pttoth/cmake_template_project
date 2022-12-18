@@ -106,7 +106,7 @@ fnReadClassName()#CFG_START
 
 	while [ -z $sInBuffer ];
 	do
-		echo "class name:"
+		echo -n "class name: "
 		read sInBuffer
 	done
 
@@ -125,7 +125,7 @@ fnReadHeaderExtension()
 
 	while [ -z $bValid ];
 	do
-		echo "Header is .h and NOT .hpp? (Y/n) ('n', if .hpp)"
+		echo -n "Header is .h and NOT .hpp? (Y/n): "
 		read sInBuffer
 
 		if [ -z $sInBuffer ];
@@ -154,16 +154,32 @@ fnReadHeaderExtension()
 
 fnReadFilePath()
 {
+	#check parameter count
+	if [[ "$#" != 1 ]];
+	then
+		echo "error: invalid argument count"
+		echo "  param1: path to project folder"
+		return 1
+	fi
+	
+	#local vars
+	local sProjectPath=$1
 	local sInBuffer=""
-	local bValid=""
+	local bValid="" # "" or 1
 	local bFilesExist=0
+	local sFilePathH=""
+	local sFilePathS=""
 
 	while [ -z $bValid ];
 	do
+		bValid=""
+		bFilesExist=0
 		sInBuffer=""
-		echo "Path inside 'include/' and 'src/' :"
+		echo -n "Path inside 'include/' and 'src/': "
 		read sInBuffer
 
+		#TODO: check this, whether it defaults to root, etc.
+		#		it shouldn't do root, and give error instead
 		if [[ -n $sInBuffer ]];
 		then
 			sInBuffer=$sInBuffer"/"
@@ -171,30 +187,33 @@ fnReadFilePath()
 
 		sFilePathH=${sInBuffer}${sFileNameH}
 		sFilePathS=${sInBuffer}${sFileNameS}
-
-		#TODO: check whether files exist
-		if [ -e $sFilePathH ];
+		sAbsPathH=${sProjectPath}'/include/'${sFilePathH}
+		sAbsPathS=${sProjectPath}'/src/'${sFilePathS}
+		
+		#check whether files exist
+		if [ -a $sAbsPathH ];
 		then
-			echo "ERROR: " $sFilePathH " already exists!"
+			echo "ERROR: " $sAbsPathH " already exists!"
 			bFilesExist=1
+			bValid=""
 		fi
 
-		if [ -e $sFilePathS ];
+		if [ -a $sAbsPathS ];
 		then
-			echo "ERROR: " $sFilePathS " already exists!"
+			echo "ERROR: " $sAbsPathS " already exists!"
 			bFilesExist=1
+			bValid=""
 		fi
 
-		#if files
-		if [[ 0==$bFilesExist ]];
+
+		if [[ 0 == $bFilesExist ]];
 		then
+			echo Header path: "include/"${sFilePathH}
+			echo Source path: "src/"${sFilePathS}
+			echo -n "OK? (Y/n) "
 
-			echo Header path: "include/"$sFilePathH
-			echo Source path: "src/"$sFilePathS
-			echo "OK? (Y/n)"
-
-			sFilePathH="$ProjectDir/include/"${sInBuffer}${sFileNameH}
-			sFilePathS="$ProjectDir/src/"${sInBuffer}${sFileNameS}
+			sFilePathH="${ProjectDir}/include/"${sInBuffer}${sFileNameH}
+			sFilePathS="${ProjectDir}/src/"${sInBuffer}${sFileNameS}
 
 
 			sInBuffer=""
@@ -210,7 +229,6 @@ fnReadFilePath()
 				fi
 				echo "invalid parameter!"
 			fi
-
 		fi
 	done
 }
@@ -224,7 +242,7 @@ fnReadParentClass()
 
 	while [ -z $bValid ];
 	do
-		echo "Inherits from a class (y/N)?"
+		echo "Inherits from a class? (y/N) "
 		read sInBuffer
 
 		if [ -z $sInBuffer ];
@@ -266,7 +284,7 @@ fnReadNamespace()
 
 	while [[ -z $bValid ]]
 	do
-		echo "Add under a namespace? (y/N)"
+		echo -n "Add under a namespace? (y/N) "
 		read sInBuffer
 
 		if [ -z $sInBuffer ];
@@ -308,7 +326,7 @@ fnReadExplicitFunctions()
 
 	while [[ -z $bValid ]]
 	do
-		echo "Make functions explicit default? (y/N)"
+		echo -n "Make functions explicit default? (y/N) "
 		read sInBuffer
 		if [ -z $sInBuffer ];
 		then
@@ -347,7 +365,7 @@ ProjectDir=$(dirname $scriptdir)
 #prompt the user for the class properties
 fnReadClassName
 fnReadHeaderExtension
-fnReadFilePath
+fnReadFilePath $ProjectDir
 #fnReadParentClass
 #fnReadNamespace
 fnReadExplicitFunctions
@@ -361,8 +379,10 @@ then
 fi
 
 echo "Class name:                 " $sClassname
-echo "Header file path:           " $sFilePathH
-echo "Source file path:           " $sFilePathS
+echo "Header file name:           " $sFileNameH
+echo "Source file name:           " $sFileNameS
+echo "Header file relative path:  " $sFilePathH
+echo "Source file relative path:  " $sFilePathS
 
 if [ $bHasParent == "true" ];
 then
