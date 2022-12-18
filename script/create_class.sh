@@ -83,7 +83,7 @@ fnCreateSubdirectory ()
 		if [[ 0 != $(test -e $sCurrent) ]] && [[ $sCurrent != "" ]] && [[ $sCurrent != '.' ]];
 		then
 			sArrPaths+=(${sCurrent})
-			sCurrent=$(dirname -- $sCurrent)
+			sCurrent=$(dirname $sCurrent)
 			iCount=$((iCount + 1))
 		else
 			bDone=1
@@ -156,6 +156,7 @@ fnReadFilePath()
 {
 	local sInBuffer=""
 	local bValid=""
+	local bFilesExist=0
 
 	while [ -z $bValid ];
 	do
@@ -171,6 +172,24 @@ fnReadFilePath()
 		sFilePathH=${sInBuffer}${sFileNameH}
 		sFilePathS=${sInBuffer}${sFileNameS}
 
+		#TODO: check whether files exist
+		if [ -e $sFilePathH ];
+		then
+			echo "ERROR: " $sFilePathH " already exists!"
+			bFilesExist=1
+		fi
+
+		if [ -e $sFilePathS ];
+		then
+			echo "ERROR: " $sFilePathS " already exists!"
+			bFilesExist=1
+		fi
+
+		#if files
+		if [[ 0==$bFilesExist ]];
+		then
+
+		#temporarily skipped indentation for commit's diff-clarity
 		echo Header path: "include/"$sFilePathH
 		echo Source path: "src/"$sFilePathS
 		echo "OK? (Y/n)"
@@ -191,6 +210,8 @@ fnReadFilePath()
 				bValid=""
 			fi
 			echo "invalid parameter!"
+		fi
+
 		fi
 	done
 }
@@ -311,7 +332,7 @@ fnReadExplicitFunctions()
 
 
 #--------------------------------------------------
-#  read + confirmation
+#  Script Start
 #--------------------------------------------------
 
 #find out script directory
@@ -319,17 +340,12 @@ pushd $(dirname "${BASH_SOURCE[0]}") > /dev/null
 scriptdir=$(pwd)
 popd > /dev/null
 
-#here, the path is <projectpath>/script/..
+#at this point, the path is <projectpath>/script/..
 #fix it to <projectpath>
-ProjectDir=$(dirname -- $scriptdir)
+ProjectDir=$(dirname $scriptdir)
 
 
-#move to project root directory
-#pushd $scriptdir
-#popd #from $scriptdir
-
-
-
+#prompt the user for the class properties
 fnReadClassName
 fnReadHeaderExtension
 fnReadFilePath
@@ -338,6 +354,7 @@ fnReadFilePath
 fnReadExplicitFunctions
 
 
+#print an overview of the answers
 echo "--------------------------------------------------"
 if [ $bHasNamespace == "true" ];
 then
@@ -365,6 +382,8 @@ echo "--------------------------------------------------"
 sProjectRoot=""
 sFPathH=${sProjectRoot}"/"${sFilePathH}
 sFPathS=${sProjectRoot}"/"${sFilePathS}
+
+#check for conflicts with existing files
 bAbortCopy="false"
 
 if [[ -e $sFPathH ]];
