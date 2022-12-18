@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#TODO: checkthis
-sArrPaths=()
 
 #fnReverseArray
 #  param1: array to reverse
@@ -46,6 +44,7 @@ fnCreateSubdirectory ()
 	local sPathRel=$2
 	local sCurrent=$sPathRel
 	local sArrPaths=()
+	local sArrPathsRev=()
 	local bDone=0
 	local iCount=0
 	
@@ -57,12 +56,7 @@ fnCreateSubdirectory ()
 		#if path doesn't exist
 		if [[ 0 != $(test -e $sCurrent) ]] && [[ $sCurrent != "" ]] && [[ $sCurrent != '.' ]];
 		then
-			#sArrPaths+=${sCurrent}
 			sArrPaths+=(${sCurrent})
-			echo $sCurrent
-			echo $iCount
-			echo ${sArrPaths[*]}
-			echo ${sArrPaths[@]}
 			sCurrent=$(dirname -- $sCurrent)
 			iCount=$((iCount + 1))
 		else
@@ -70,13 +64,10 @@ fnCreateSubdirectory ()
 		fi
 	done
 	
-	sArrPathsRev=()
-	
-	#create missing folders
+	#reverse the array of paths to get correct order
 	fnReverseArray sArrPaths sArrPathsRev
 	
-	echo B:${sArrPathsRev[@]}
-
+	#create missing folders
 	mkdir ${sArrPathsRev[@]}
 	
 	return 0
