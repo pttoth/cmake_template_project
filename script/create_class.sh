@@ -13,6 +13,7 @@ sHeaderExt=".h"
 sClassname="n/a"
 sFileNameH="n/a"
 sFileNameS="n/a"
+sInclPathH="n/a"
 
 sParentClassname="n/a"
 sNamespace="n/a"
@@ -80,7 +81,7 @@ fnCreateSubdirectory ()
 	while [[ $bDone == 0 ]];
 	do
 		#if path doesn't exist
-		if [[ 0 != $(test -e $sCurrent) ]] && [[ $sCurrent != "" ]] && [[ $sCurrent != '.' ]];
+		if [[ 0 != $(test -e $sCurrent) ]] && [[ $sCurrent != "" ]] && [[ $sCurrent != '.' ]] && [[ $sCurrent != '/' ]];
 		then
 			sArrPaths+=(${sCurrent})
 			sCurrent=$(dirname $sCurrent)
@@ -94,7 +95,7 @@ fnCreateSubdirectory ()
 	fnReverseArray sArrPaths sArrPathsRev
 
 	#create missing folders
-	mkdir ${sArrPathsRev[@]}
+	mkdir ${sArrPathsRev[@]} &> /dev/null
 
 	return 0
 }
@@ -192,6 +193,8 @@ fnReadFilePath()
 		sAbsPathH=${lsProjectPath}'/include/'${lsFilePathH}
 		sAbsPathS=${lsProjectPath}'/src/'${lsFilePathS}
 		
+		sInclPathH=${lsFilePathH}
+
 		
 		#check whether files exist
 		if [ -a $sAbsPathH ];
@@ -405,9 +408,9 @@ echo "--------------------------------------------------"
 #  create file
 #--------------------------------------------------
 
-#TODO: get scriptfolder
-
-#TODO: create folder structures in 'include/' and 'src/'
+#TODO: fix, second param should be relative
+fnCreateSubdirectory $(dirname $scriptdir) $(dirname $sAbsPathH)
+fnCreateSubdirectory $(dirname $scriptdir) $(dirname $sAbsPathS)
 
 #TODO: check again for existing files and silently rename them to <name>.bak, just in case someone created them since checking
 
@@ -444,6 +447,9 @@ then
 	soDefDefault=""
 fi
 
+sIncludeLine="#include \"$sInclPathH\""
 
-cat $scriptdir/data/newclass.h | sed 's/__parentInclude__/$soParentInclude/g' | sed 's/__namespaceOpen__/$soNamespaceOpen/g' | sed 's/__namespaceClose__/$soNamespaceClose/g' | sed 's/__className__/$soClassName/g' | sed 's/__parentClassInherit__/$soParentClassInherit/g' | sed 's/__defDefault__/$soDefDefault/g' > $sFilePathH
+cat $scriptdir/data/newclass.h.model | sed "s/__parentInclude__/$soParentInclude/g" | sed "s/__namespaceOpen__/$soNamespaceOpen/g" | sed "s/__namespaceClose__/$soNamespaceClose/g" | sed "s/__className__/$soClassName/g" | sed "s/__parentClassInherit__/$soParentClassInherit/g" | sed "s/__defDefault__/$soDefDefault/g" > $sFilePathH
+#cat $scriptdir/data/newclass.cpp.model | sed "s/__headerInclude__/$sIncludeLine/g" | sed "s/__className__/$soClassName/g" | sed "s/__usingNamespaceName__/\#using namespace ClassNameSpace;/g" > $sFilePathS
 
+cat $scriptdir/data/newclass.cpp.model | sed -e "s|__headerInclude__|$sIncludeLine|g" | sed "s/__className__/$soClassName/g" | sed "s/__usingNamespaceName__/\/\/using namespace ClassNameSpace;/g" > $sFilePathS

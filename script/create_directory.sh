@@ -54,13 +54,15 @@ fnCreateSubdirectory ()
 	while [[ $bDone == 0 ]];
 	do
 		#if path doesn't exist
-		if [[ 0 != $(test -e $sCurrent) ]] && [[ $sCurrent != "" ]] && [[ $sCurrent != '.' ]];
+		if [[ 0 != $(test -e $sCurrent) ]] && [[ $sCurrent != "" ]] && [[ $sCurrent != '.' ]] && [[ $sCurrent != '/' ]];
 		then
+			echo "doesn't exist yet: $sCurrent"
 			sArrPaths+=(${sCurrent})
 			sCurrent=$(dirname -- $sCurrent)
 			iCount=$((iCount + 1))
 		else
 			bDone=1
+			echo "already exists: $sCurrent"
 		fi
 	done
 	
@@ -68,7 +70,7 @@ fnCreateSubdirectory ()
 	fnReverseArray sArrPaths sArrPathsRev
 	
 	#create missing folders
-	mkdir ${sArrPathsRev[@]}
+	mkdir ${sArrPathsRev[@]} &> /dev/null
 	
 	return 0
 }
